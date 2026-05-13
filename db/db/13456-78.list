@@ -1,0 +1,822 @@
+{
+  "project": {
+    "id": "13456-78",
+    "techName": "planfa",
+    "createdAt": "2026-05-05T20:57:17.497Z"
+  },
+  "sublists": [
+    {
+      "projectId": "13456-78",
+      "name": "liste",
+      "type": "fiche_achat",
+      "id": "t2k4m93ca"
+    },
+    {
+      "projectId": "13456-78",
+      "name": "fa2",
+      "type": "fiche_achat",
+      "id": "vbsz266md"
+    }
+  ],
+  "bomLines": [
+    {
+      "projectId": "13456-78",
+      "ref": "29450",
+      "quantity": 64,
+      "sublistId": "t2k4m93ca",
+      "location": "",
+      "id": "t5dtpau0n"
+    },
+    {
+      "id": "hm4s8cxbk",
+      "projectId": "13456-78",
+      "ref": "41950",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "qj6ym9act",
+      "projectId": "13456-78",
+      "ref": "A9A15306",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "9otuok9bx",
+      "projectId": "13456-78",
+      "ref": "A9F74203",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "1fmfcuvih",
+      "projectId": "13456-78",
+      "ref": "A9F74204",
+      "quantity": 4,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "f3naqsnew",
+      "projectId": "13456-78",
+      "ref": "A9F74404",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "bi0dfm3j9",
+      "projectId": "13456-78",
+      "ref": "A9F87210",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "mphzapfdg",
+      "projectId": "13456-78",
+      "ref": "A9S70640",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "6hvqn8bcy",
+      "projectId": "13456-78",
+      "ref": "C1042D040",
+      "quantity": 6,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "ry2muv3a7",
+      "projectId": "13456-78",
+      "ref": "C1042D100",
+      "quantity": 18,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "cjjo30ys1",
+      "projectId": "13456-78",
+      "ref": "C10F4",
+      "quantity": 24,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "cyzpli325",
+      "projectId": "13456-78",
+      "ref": "C1642D160",
+      "quantity": 2,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "grre90k2m",
+      "projectId": "13456-78",
+      "ref": "C16F4",
+      "quantity": 2,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "te0usq9pa",
+      "projectId": "13456-78",
+      "ref": "C2532D250",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "7ydiz9e3f",
+      "projectId": "13456-78",
+      "ref": "C2542D250",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "7cma5hy96",
+      "projectId": "13456-78",
+      "ref": "C25F3",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "zzgb7ri6n",
+      "projectId": "13456-78",
+      "ref": "C25F4",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "d2p1bcxf4",
+      "projectId": "13456-78",
+      "ref": "C4032D400",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "v92sux5g8",
+      "projectId": "13456-78",
+      "ref": "C40F3",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "g10k96a8q",
+      "projectId": "13456-78",
+      "ref": "LV429236",
+      "quantity": 54,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "50tvu4svb",
+      "projectId": "13456-78",
+      "ref": "LV429267",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "74asqnee3",
+      "projectId": "13456-78",
+      "ref": "LV429268",
+      "quantity": 12,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "4dc471z1g",
+      "projectId": "13456-78",
+      "ref": "LV429270",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "vk6x5wchm",
+      "projectId": "13456-78",
+      "ref": "LV429273",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "geyg87qz4",
+      "projectId": "13456-78",
+      "ref": "LV429274",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "i7qri4wro",
+      "projectId": "13456-78",
+      "ref": "LV429275",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "lzkv5t7v6",
+      "projectId": "13456-78",
+      "ref": "LV429307",
+      "quantity": 6,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "wi9015byr",
+      "projectId": "13456-78",
+      "ref": "LV429338T",
+      "quantity": 27,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "u29fh5wws",
+      "projectId": "13456-78",
+      "ref": "LV429387",
+      "quantity": 4,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "vnkbqgsww",
+      "projectId": "13456-78",
+      "ref": "LV429515",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "ty6fnahe1",
+      "projectId": "13456-78",
+      "ref": "LV429516",
+      "quantity": 32,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "lds9g0ny5",
+      "projectId": "13456-78",
+      "ref": "LV429517",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "3heldnj2u",
+      "projectId": "13456-78",
+      "ref": "LV429518",
+      "quantity": 32,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "w30jso9oy",
+      "projectId": "13456-78",
+      "ref": "LV432475",
+      "quantity": 2,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "1ydgf6hpp",
+      "projectId": "13456-78",
+      "ref": "LV432591",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "hfww6ey7m",
+      "projectId": "13456-78",
+      "ref": "LV432593",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "gbnosqd08",
+      "projectId": "13456-78",
+      "ref": "LV434021",
+      "quantity": 28,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "ini9uw5nx",
+      "projectId": "13456-78",
+      "ref": "LV434022",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "x304k0rl9",
+      "projectId": "13456-78",
+      "ref": "LV833725",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "hc04pmsi0",
+      "projectId": "13456-78",
+      "ref": "LV833735",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "vr58fg6u4",
+      "projectId": "13456-78",
+      "ref": "LV833738",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "7axps0uv8",
+      "projectId": "13456-78",
+      "ref": "LV833769SP",
+      "quantity": 2,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "8e8gey5op",
+      "projectId": "13456-78",
+      "ref": "LV833813",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "4nlkv4zff",
+      "projectId": "13456-78",
+      "ref": "PAS600L",
+      "quantity": 2,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "g9az8qwra",
+      "projectId": "13456-78",
+      "ref": "192T7090",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "qrh20rhif",
+      "projectId": "13456-78",
+      "ref": "CAD32P7",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "bay58vsaj",
+      "projectId": "13456-78",
+      "ref": "CAD50P7",
+      "quantity": 5,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "r0oetwuzw",
+      "projectId": "13456-78",
+      "ref": "GV2LE20",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "w7dilmxsz",
+      "projectId": "13456-78",
+      "ref": "GVAD0110",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "xbsu1f5mo",
+      "projectId": "13456-78",
+      "ref": "LADT0",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "mdr07uu3i",
+      "projectId": "13456-78",
+      "ref": "RM17TG20",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "s5kzeyfwk",
+      "projectId": "13456-78",
+      "ref": "XB4BS8445",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "mn527h5mw",
+      "projectId": "13456-78",
+      "ref": "XB4BVM3",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "3bqjh0n93",
+      "projectId": "13456-78",
+      "ref": "XB4BVM4",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "kkxjf3bcw",
+      "projectId": "13456-78",
+      "ref": "ZBZ1604",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "dwzo56n7q",
+      "projectId": "13456-78",
+      "ref": "A9A26904",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "3cl60upaq",
+      "projectId": "13456-78",
+      "ref": "A9A26909",
+      "quantity": 7,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "6xsh11uj9",
+      "projectId": "13456-78",
+      "ref": "A9Q14225",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "3mqi3myoa",
+      "projectId": "13456-78",
+      "ref": "METSEPM5110",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "0lpqa4u8l",
+      "projectId": "13456-78",
+      "ref": "LV833093",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "jvbc28ryk",
+      "projectId": "13456-78",
+      "ref": "LV833751",
+      "quantity": 6,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "va1kn84gv",
+      "projectId": "13456-78",
+      "ref": "LV833857SP",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "tdhso6xjh",
+      "projectId": "13456-78",
+      "ref": "LV836388",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "yshiv10so",
+      "projectId": "13456-78",
+      "ref": "LV839462",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "93p3sojyn",
+      "projectId": "13456-78",
+      "ref": "LV847225",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "5udgmqnsn",
+      "projectId": "13456-78",
+      "ref": "LV847253",
+      "quantity": 2,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "pk8zqllp0",
+      "projectId": "13456-78",
+      "ref": "LV847284",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "dr5cc8t7f",
+      "projectId": "13456-78",
+      "ref": "LV847430",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "oh1cu7t34",
+      "projectId": "13456-78",
+      "ref": "LV847906",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "rusox2ewz",
+      "projectId": "13456-78",
+      "ref": "LV850002",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "r2gf6htl8",
+      "projectId": "13456-78",
+      "ref": "LV850064",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "wrib5o2n7",
+      "projectId": "13456-78",
+      "ref": "LV851100",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "al4ycy68h",
+      "projectId": "13456-78",
+      "ref": "0666-10168",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "j544ld4mh",
+      "projectId": "13456-78",
+      "ref": "0467-1024",
+      "quantity": 4,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "90ai8ilx",
+      "projectId": "13456-78",
+      "ref": "34",
+      "quantity": 28,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "xqbguz46h",
+      "projectId": "13456-78",
+      "ref": "35",
+      "quantity": 6,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "wkl9d52g0",
+      "projectId": "13456-78",
+      "ref": "45",
+      "quantity": 3,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "v9y8nzshz",
+      "projectId": "13456-78",
+      "ref": "750-600",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "1s53sgn6y",
+      "projectId": "13456-78",
+      "ref": "750-8212/000-100",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "98hjsgotp",
+      "projectId": "13456-78",
+      "ref": "750-960",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "3l1qrhwtc",
+      "projectId": "13456-78",
+      "ref": "787-712",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "jbdjavcfl",
+      "projectId": "13456-78",
+      "ref": "787-722",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "mdk9y9qf8",
+      "projectId": "13456-78",
+      "ref": "852-111",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "jm24dgr9n",
+      "projectId": "13456-78",
+      "ref": "553490240094",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "p5tkhvdtw",
+      "projectId": "13456-78",
+      "ref": "800102400000",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "kbini0kc8",
+      "projectId": "13456-78",
+      "ref": "9454SPA",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "8g9bmcomf",
+      "projectId": "13456-78",
+      "ref": "177113",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "id": "bzn7bj0bs",
+      "projectId": "13456-78",
+      "ref": "100007437",
+      "quantity": 1,
+      "category": "Autre",
+      "sublistId": "t2k4m93ca",
+      "location": ""
+    },
+    {
+      "projectId": "13456-78",
+      "ref": "020442",
+      "quantity": 1,
+      "sublistId": "t2k4m93ca",
+      "location": "",
+      "id": "1zjdpq04e"
+    }
+  ]
+}

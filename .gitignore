@@ -1,0 +1,20 @@
+node_modules/
+build/
+dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+database.json*
+database.sqlite*
+data/
+
+# Fichiers de données locaux
+*.db
+*.xls
+*.xlsm
+
+# Electron & Build
+dist-electron/
+release/
