@@ -14,6 +14,9 @@ data/
 *.db
 *.xls
 *.xlsm
+exemple-import/
+*.xlsx
+
 
 # Electron & Build
 dist-electron/
