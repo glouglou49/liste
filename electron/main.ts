@@ -66,6 +66,8 @@ function createWindow() {
     icon: path.join(_dirname, '../public/vite.svg'), // Temporaire
   });
 
+  mainWindow.setMenu(null);
+
   if (process.env.VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.VITE_DEV_SERVER_URL);
   } else {
