@@ -9,6 +9,9 @@ jobs:
   release:
     runs-on: windows-latest
 
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
     permissions:
       contents: write # Nécessaire pour permettre au robot de créer une release sur le dépôt
 
@@ -18,8 +21,6 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        env:
-          FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
         with:
           node-version: 24
           cache: 'npm'
