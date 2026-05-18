@@ -3,7 +3,10 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import Database from 'better-sqlite3';
-import * as xlsx from 'xlsx';const _filename = fileURLToPath(import.meta.url);
+import * as xlsx from 'xlsx';
+import { autoUpdater } from 'electron-updater';
+
+const _filename = fileURLToPath(import.meta.url);
 const _dirname = path.dirname(_filename);
 
 // Dynamic Database instance
@@ -114,6 +117,34 @@ app.whenReady().then(() => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
+});
+
+// Auto Updater Configuration
+autoUpdater.autoDownload = true;
+autoUpdater.autoInstallOnAppQuit = true;
+
+autoUpdater.on('update-available', (info) => {
+  if (mainWindow) mainWindow.webContents.send('update-available', info);
+});
+
+autoUpdater.on('download-progress', (progressObj) => {
+  if (mainWindow) mainWindow.webContents.send('download-progress', progressObj);
+});
+
+autoUpdater.on('update-downloaded', (info) => {
+  if (mainWindow) mainWindow.webContents.send('update-downloaded', info);
+});
+
+autoUpdater.on('error', (err) => {
+  if (mainWindow) mainWindow.webContents.send('update-error', err.message);
+});
+
+ipcMain.handle('check-for-updates', () => {
+  autoUpdater.checkForUpdates();
+});
+
+ipcMain.handle('quit-and-install', () => {
+  autoUpdater.quitAndInstall();
 });
 
 app.on('window-all-closed', () => {

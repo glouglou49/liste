@@ -36,4 +36,18 @@ contextBridge.exposeInMainWorld('electronAPI', {
   addChargeAffaire: (data: any) => ipcRenderer.invoke('add-charge-affaire', data),
   deleteChargeAffaire: (id: number) => ipcRenderer.invoke('delete-charge-affaire', id),
   openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
+  
+  // Auto-Update
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  quitAndInstall: () => ipcRenderer.invoke('quit-and-install'),
+  onUpdateAvailable: (callback: (event: any, info: any) => void) => ipcRenderer.on('update-available', callback),
+  onDownloadProgress: (callback: (event: any, progressObj: any) => void) => ipcRenderer.on('download-progress', callback),
+  onUpdateDownloaded: (callback: (event: any, info: any) => void) => ipcRenderer.on('update-downloaded', callback),
+  onUpdateError: (callback: (event: any, error: string) => void) => ipcRenderer.on('update-error', callback),
+  removeAllUpdateListeners: () => {
+    ipcRenderer.removeAllListeners('update-available');
+    ipcRenderer.removeAllListeners('download-progress');
+    ipcRenderer.removeAllListeners('update-downloaded');
+    ipcRenderer.removeAllListeners('update-error');
+  }
 });

@@ -77,6 +77,15 @@ declare global {
       addChargeAffaire: (data: { filiale_id: number; name: string }) => Promise<{ success: boolean; id?: number; error?: string }>;
       deleteChargeAffaire: (id: number) => Promise<{ success: boolean; error?: string }>;
       openExternal: (url: string) => Promise<{ success: boolean; error?: string }>;
+      
+      // Auto-Update
+      checkForUpdates: () => Promise<void>;
+      quitAndInstall: () => Promise<void>;
+      onUpdateAvailable: (callback: (event: any, info: any) => void) => void;
+      onDownloadProgress: (callback: (event: any, progressObj: any) => void) => void;
+      onUpdateDownloaded: (callback: (event: any, info: any) => void) => void;
+      onUpdateError: (callback: (event: any, error: string) => void) => void;
+      removeAllUpdateListeners: () => void;
     };
   }
 }

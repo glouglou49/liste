@@ -1,7 +1,7 @@
 {
   "name": "liste-app",
   "private": true,
-  "version": "1.0.2",
+  "version": "1.0.3",
   "repository": {
     "type": "git",
     "url": "https://github.com/glouglou49/liste.git"
@@ -24,6 +24,7 @@
     "@vitejs/plugin-react": "^5.0.4",
     "better-sqlite3": "^12.9.0",
     "date-fns": "^4.1.0",
+    "electron-updater": "^6.8.3",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.546.0",
