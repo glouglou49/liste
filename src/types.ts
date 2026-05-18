@@ -3,6 +3,17 @@ export type Manufacturer = {
   name: string;
 };
 
+export type Filiale = {
+  id?: number;
+  name: string;
+};
+
+export type ChargeAffaire = {
+  id?: number;
+  filiale_id: number;
+  name: string;
+};
+
 export type ComponentRef = {
   ref: string;
   designation: string;
@@ -11,9 +22,23 @@ export type ComponentRef = {
 };
 
 export type Project = {
-  id: string; // N° Affaire
+  id: string; // N° Affaire (ou Affaire origine si c'est la même chose)
   techName: string; // Technicien BE
   createdAt: string;
+  filialeOrigine?: string;
+  affaireOrigine?: string;
+  ligneOrigine?: string;
+  filialeExecutant?: string;
+  affaireExecutant?: string;
+  ligneExecutant?: string;
+  affaireUF?: string;
+  ligneUF?: string;
+  client?: string;
+  nomAffaire?: string;
+  nomTableau?: string;
+  chargeAffaire?: string;
+  isSousTraitance?: boolean;
+  isUF?: boolean;
 };
 
 export type SublistType = 'fiche_achat' | 'appro_anticipe';

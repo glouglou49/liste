@@ -10,13 +10,31 @@
       "name": "fa1",
       "type": "fiche_achat",
       "id": "ctc9er2o5"
+    },
+    {
+      "projectId": "134657-58",
+      "name": "1",
+      "type": "appro_anticipe",
+      "id": "xcjvucrun"
+    },
+    {
+      "projectId": "134657-58",
+      "name": "2",
+      "type": "appro_anticipe",
+      "id": "ony8fcb3a"
+    },
+    {
+      "projectId": "134657-58",
+      "name": "3",
+      "type": "appro_anticipe",
+      "id": "xjcugus4a"
     }
   ],
   "bomLines": [
     {
       "projectId": "134657-58",
       "ref": "29450",
-      "quantity": 2,
+      "quantity": 6,
       "sublistId": "ctc9er2o5",
       "location": "",
       "id": "fy4bzsqvm"
@@ -36,6 +54,38 @@
       "sublistId": "ctc9er2o5",
       "location": "",
       "id": "dw70y09me"
+    },
+    {
+      "projectId": "134657-58",
+      "ref": "29450",
+      "quantity": 2,
+      "sublistId": "xcjvucrun",
+      "location": "",
+      "id": "w24vt73kb"
+    },
+    {
+      "projectId": "134657-58",
+      "ref": "A9F77210",
+      "quantity": 3,
+      "sublistId": "ony8fcb3a",
+      "location": "",
+      "id": "t0gy1snje"
+    },
+    {
+      "projectId": "134657-58",
+      "ref": "33751",
+      "quantity": 1,
+      "sublistId": "xjcugus4a",
+      "location": "",
+      "id": "wwjl2xko8"
+    },
+    {
+      "projectId": "134657-58",
+      "ref": "29450",
+      "quantity": 1,
+      "sublistId": "ListeAchat",
+      "location": "",
+      "id": "3lxbbb1vc"
     }
   ]
 }

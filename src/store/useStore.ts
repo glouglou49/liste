@@ -1,27 +1,37 @@
 import { create } from 'zustand';
-import { Project, BOMLine, Manufacturer, ComponentRef, Sublist, Category } from '../types';
+import { Project, BOMLine, Manufacturer, ComponentRef, Sublist, Category, Filiale, ChargeAffaire } from '../types';
 import { mockManufacturers, mockReferences, mockProjects } from '../mockData';
+
+export type RecentFile = { id: string, path: string, tech: string, nomAffaire?: string, nomTableau?: string, lastOpened: number };
 
 interface AppState {
   bomLines: BOMLine[];
   manufacturers: Manufacturer[];
+  filiales: Filiale[];
+  chargeAffaires: ChargeAffaire[];
   currentProjectId: string | null;
   currentProject: Project | null;
   currentProjectPath: string | null;
   sublists: Sublist[];
-  rootPath: string | null;
+  dbFilePath: string | null;
+  recentFiles: RecentFile[];
+  defaultTechName: string;
   
   isLoaded: boolean;
   loadState: () => Promise<void>;
+  refreshCatalogs: () => Promise<void>;
   saveState: () => Promise<void>;
-  setRootPath: (path: string) => Promise<void>;
+  setDbFilePath: (path: string) => Promise<void>;
+  setDefaultTechName: (name: string) => Promise<void>;
   
   addSublist: (sublist: Omit<Sublist, 'id'>) => Promise<void>;
   removeSublist: (id: string) => Promise<void>;
   
+  updateProjectSettings: (data: Partial<Project>) => Promise<void>;
   closeProject: () => void;
   openProjectFromFile: () => Promise<void>;
-  createProjectInteractive: (id: string, techName: string) => Promise<boolean>;
+  openProjectByPath: (filePath: string) => Promise<void>;
+  createProjectInteractive: (projectData: Omit<Project, 'createdAt'>) => Promise<boolean>;
   
   addOrUpdateBOMLine: (line: Omit<BOMLine, 'id'>) => Promise<void>;
   removeBOMLine: (id: string) => Promise<void>;
@@ -36,14 +46,20 @@ declare global {
       getManufacturers: () => Promise<Manufacturer[]>;
       searchReferences: (query: string, fabCode?: string) => Promise<ComponentRef[]>;
       getReference: (ref: string) => Promise<ComponentRef | null>;
-      selectDirectory: () => Promise<string | null>;
+      selectDbFile: () => Promise<string | null>;
       openProjectFile: () => Promise<{ filePath: string, data: any } | { error: string } | null>;
-      saveNewProjectFile: (data: any) => Promise<string | { error: string } | null>;
+      openProjectByPath: (filePath: string) => Promise<{ filePath: string, data: any } | { error: string }>;
+      saveNewProjectFile: (data: any, defaultFilename?: string) => Promise<string | { error: string } | null>;
       saveProjectByPath: (filePath: string, data: any) => Promise<{ success: boolean; error?: string }>;
+      exportExcelAuto: (listFilePath: string, filename: string, base64Data: string) => Promise<{ success: boolean; filePath?: string; error?: string }>;
+      exportPdfAuto: (listFilePath: string, filename: string, base64Data: string) => Promise<{ success: boolean; filePath?: string; error?: string }>;
       saveConfig: (config: any) => Promise<any>;
       loadConfig: () => Promise<any>;
+      verifyAdminPassword: (password: string) => Promise<boolean>;
+      updateAdminPassword: (newPassword: string) => Promise<{ success: boolean; error?: string }>;
       
-      importExcelCatalog: () => Promise<{ success: boolean; error?: string }>;
+      previewExcelCatalog: () => Promise<{ success: boolean; filePath?: string; schema?: Record<string, { id: string; label: string }[]>; error?: string }>;
+      importExcelCatalog: (filePath: string, mapping: any) => Promise<{ success: boolean; error?: string }>;
       getPaginatedReferences: (page: number, pageSize: number, search: string) => Promise<{ items: ComponentRef[]; total: number }>;
       addReference: (data: Omit<ComponentRef, 'weight'> & { weight?: number }) => Promise<{ success: boolean; error?: string }>;
       updateReference: (oldRef: string, data: Omit<ComponentRef, 'weight'> & { weight?: number }) => Promise<{ success: boolean; error?: string }>;
@@ -51,6 +67,15 @@ declare global {
       addManufacturer: (data: Manufacturer) => Promise<{ success: boolean; error?: string }>;
       updateManufacturer: (oldCode: string, data: Manufacturer) => Promise<{ success: boolean; error?: string }>;
       deleteManufacturer: (code: string) => Promise<{ success: boolean; error?: string }>;
+      
+      getFiliales: () => Promise<Filiale[]>;
+      addFiliale: (data: { name: string }) => Promise<{ success: boolean; id?: number; error?: string }>;
+      updateFiliale: (id: number, data: { name: string }) => Promise<{ success: boolean; error?: string }>;
+      deleteFiliale: (id: number) => Promise<{ success: boolean; error?: string }>;
+
+      getChargeAffaires: () => Promise<ChargeAffaire[]>;
+      addChargeAffaire: (data: { filiale_id: number; name: string }) => Promise<{ success: boolean; id?: number; error?: string }>;
+      deleteChargeAffaire: (id: number) => Promise<{ success: boolean; error?: string }>;
     };
   }
 }
@@ -61,16 +86,27 @@ export const useStore = create<AppState>((set, get) => ({
   sublists: [],
   bomLines: [],
   manufacturers: [],
+  filiales: [],
+  chargeAffaires: [],
   currentProjectId: null,
   currentProject: null,
   currentProjectPath: null,
-  rootPath: null,
+  dbFilePath: null,
+  recentFiles: [],
+  defaultTechName: 'Technicien BE',
   isLoaded: false,
 
-  setRootPath: async (path) => {
-    set({ rootPath: path });
+  setDbFilePath: async (path) => {
+    set({ dbFilePath: path });
     if (window.electronAPI) {
-      await window.electronAPI.saveConfig({ rootPath: path });
+      await window.electronAPI.saveConfig({ dbFilePath: path });
+    }
+  },
+
+  setDefaultTechName: async (name: string) => {
+    set({ defaultTechName: name });
+    if (window.electronAPI) {
+      await window.electronAPI.saveConfig({ defaultTechName: name });
     }
   },
 
@@ -101,22 +137,32 @@ export const useStore = create<AppState>((set, get) => ({
   loadState: async () => {
     try {
       let manufacturers = mockManufacturers || [];
-
       if (window.electronAPI) {
-        const mfg = await window.electronAPI.getManufacturers();
-        if (mfg) manufacturers = mfg;
-
+        const manufPromise = window.electronAPI.getManufacturers();
+        const filialesPromise = window.electronAPI.getFiliales();
+        const caPromise = window.electronAPI.getChargeAffaires();
         const config = await window.electronAPI.loadConfig();
-        if (config?.rootPath) {
-          set({ rootPath: config.rootPath });
-        }
+        
+        const [manufData, filialesData, caData] = await Promise.all([manufPromise, filialesPromise, caPromise]);
+        
+        set({
+          manufacturers: manufData || [],
+          filiales: filialesData || [],
+          chargeAffaires: caData || [],
+          recentFiles: config?.recentFiles || [],
+          dbFilePath: config?.dbFilePath || null,
+          defaultTechName: config?.defaultTechName || 'Technicien BE',
+          isLoaded: true
+        });
+      } else {
+        set({
+          manufacturers: mockManufacturers,
+          filiales: [],
+          chargeAffaires: [],
+          isLoaded: true
+        });
       }
-
-      set({
-        manufacturers: manufacturers,
-        isLoaded: true
-      });
-
+      
       if (!window.electronAPI) {
         const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (saved) {
@@ -130,6 +176,57 @@ export const useStore = create<AppState>((set, get) => ({
     } catch(e) {
       console.error("Failed to load state", e);
     }
+  },
+
+  refreshCatalogs: async () => {
+    if (window.electronAPI) {
+      try {
+        const manufPromise = window.electronAPI.getManufacturers();
+        const filialesPromise = window.electronAPI.getFiliales();
+        const caPromise = window.electronAPI.getChargeAffaires();
+        const [manufData, filialesData, caData] = await Promise.all([manufPromise, filialesPromise, caPromise]);
+        set({
+          manufacturers: manufData || [],
+          filiales: filialesData || [],
+          chargeAffaires: caData || []
+        });
+      } catch (e) {
+        console.error("Failed to refresh catalogs", e);
+      }
+    }
+  },
+
+  updateProjectSettings: async (data: Partial<Project>) => {
+    const current = get().currentProject;
+    if (!current) return;
+    
+    // Si affaireOrigine ou ligneOrigine change, on met à jour l'ID global de l'affaire
+    let newId = current.id;
+    if (data.affaireOrigine !== undefined || data.ligneOrigine !== undefined) {
+      const ao = data.affaireOrigine ?? current.affaireOrigine ?? '';
+      const lo = data.ligneOrigine ?? current.ligneOrigine ?? '';
+      if (ao && lo) {
+        newId = `${ao.trim()}-${lo.trim()}`;
+      }
+    }
+    
+    if (data.isUF) {
+      const existingSublists = get().sublists;
+      const hasUfList = existingSublists.some(s => s.name === 'APPRO ANTICIPE UF' && s.type === 'appro_anticipe');
+      if (!hasUfList) {
+        const newSublist = { 
+          id: Math.random().toString(36).substr(2,9), 
+          projectId: newId, 
+          name: 'APPRO ANTICIPE UF', 
+          type: 'appro_anticipe' as const 
+        };
+        set({ sublists: [...existingSublists, newSublist] });
+      }
+    }
+    
+    const updated = { ...current, ...data, id: newId };
+    set({ currentProject: updated, currentProjectId: newId });
+    await get().saveState();
   },
 
   closeProject: () => {
@@ -147,48 +244,106 @@ export const useStore = create<AppState>((set, get) => ({
     
     const { filePath, data } = result;
     if (data && data.project) {
+      const recent: RecentFile = { id: data.project.id, tech: data.project.techName, nomAffaire: data.project.nomAffaire, nomTableau: data.project.nomTableau, path: filePath, lastOpened: Date.now() };
+      const currentRecents = get().recentFiles.filter(r => r.path !== filePath);
+      const newRecents = [recent, ...currentRecents].slice(0, 5);
+      
       set({
         currentProjectId: data.project.id,
         currentProject: data.project,
         currentProjectPath: filePath,
         sublists: data.sublists || [],
-        bomLines: data.bomLines || []
+        bomLines: data.bomLines || [],
+        recentFiles: newRecents
       });
+      await window.electronAPI.saveConfig({ recentFiles: newRecents });
     } else {
       alert("Fichier non valide.");
     }
   },
 
-  createProjectInteractive: async (id, techName) => {
-    const newProject = { id, techName, createdAt: new Date().toISOString() };
+  openProjectByPath: async (filePath: string) => {
+    if (!window.electronAPI) return;
+    const result = await window.electronAPI.openProjectByPath(filePath);
+    if ('error' in result) {
+      alert("Erreur: " + result.error);
+      // Remove from recent if it fails
+      const newRecents = get().recentFiles.filter(r => r.path !== filePath);
+      set({ recentFiles: newRecents });
+      await window.electronAPI.saveConfig({ recentFiles: newRecents });
+      return;
+    }
+    
+    const { data } = result;
+    if (data && data.project) {
+      const recent: RecentFile = { id: data.project.id, tech: data.project.techName, nomAffaire: data.project.nomAffaire, nomTableau: data.project.nomTableau, path: filePath, lastOpened: Date.now() };
+      const currentRecents = get().recentFiles.filter(r => r.path !== filePath);
+      const newRecents = [recent, ...currentRecents].slice(0, 5);
+      
+      set({
+        currentProjectId: data.project.id,
+        currentProject: data.project,
+        currentProjectPath: filePath,
+        sublists: data.sublists || [],
+        bomLines: data.bomLines || [],
+        recentFiles: newRecents
+      });
+      await window.electronAPI.saveConfig({ recentFiles: newRecents });
+    } else {
+      alert("Fichier non valide.");
+    }
+  },
+
+  createProjectInteractive: async (data) => {
+    const newProject = { ...data, createdAt: new Date().toISOString() };
+    const initialSublists: Sublist[] = [];
+    if (data.isUF) {
+      initialSublists.push({ id: Math.random().toString(36).substr(2,9), projectId: data.id, name: 'APPRO ANTICIPE UF', type: 'appro_anticipe' });
+    }
     const projectData = {
       project: newProject,
-      sublists: [],
+      sublists: initialSublists,
       bomLines: []
     };
     
     if (window.electronAPI) {
-      const result = await window.electronAPI.saveNewProjectFile(projectData);
+      const parts = [
+        data.affaireOrigine,
+        data.ligneOrigine,
+        data.nomTableau,
+        data.nomAffaire,
+        data.client ? `(${data.client})` : ''
+      ].filter(Boolean).map(s => String(s).trim().toUpperCase());
+      const defaultFilename = parts.join(' ') + '.list';
+
+      const result = await window.electronAPI.saveNewProjectFile(projectData, defaultFilename);
       if (!result) return false; // Canceled
       if (typeof result === 'object' && 'error' in result) {
         alert("Erreur: " + result.error);
         return false;
       }
       
+      const filePath = result as string;
+      const recent: RecentFile = { id: data.id, tech: data.techName, nomAffaire: data.nomAffaire, nomTableau: data.nomTableau, path: filePath, lastOpened: Date.now() };
+      const currentRecents = get().recentFiles.filter(r => r.path !== filePath);
+      const newRecents = [recent, ...currentRecents].slice(0, 5);
+      
       set({
-        currentProjectId: id,
+        currentProjectId: data.id,
         currentProject: newProject,
-        currentProjectPath: result,
-        sublists: [],
-        bomLines: []
+        currentProjectPath: filePath,
+        sublists: initialSublists,
+        bomLines: [],
+        recentFiles: newRecents
       });
+      await window.electronAPI.saveConfig({ recentFiles: newRecents });
       return true;
     } else {
       set({
-        currentProjectId: id,
+        currentProjectId: data.id,
         currentProject: newProject,
         currentProjectPath: null,
-        sublists: [],
+        sublists: initialSublists,
         bomLines: []
       });
       get().saveState();

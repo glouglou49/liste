@@ -16,7 +16,9 @@ data/
 *.xlsm
 exemple-import/
 *.xlsx
-
+db/
+exemple-export/
+*.list
 
 # Electron & Build
 dist-electron/
