@@ -27,7 +27,7 @@ export default defineConfig(({mode}) => {
       }),
     ],
     build: {
-      minify: false,
+      minify: true,
     },
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
