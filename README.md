@@ -54,6 +54,12 @@ L'application génère des exports haut de gamme indispensables pour la transmis
 * **Architecture Electron + SQLite :** Base de données SQLite locale ultra-rapide avec recherche de références en autocomplétion floue en temps réel.
 * **Persistance Stable :** Suivi des fichiers de projets récents et sauvegarde continue.
 
+### 7. Vérification des Mises à jour depuis GitHub
+* **Détection automatique en arrière-plan :** À chaque lancement, l'application interroge l'API GitHub de votre dépôt (`glouglou49/liste`) pour récupérer la dernière version disponible.
+* **Notification Premium intégrée :** Si une version plus récente est disponible, un bandeau bleu dégradé élégant s'affiche dynamiquement au sommet de l'écran avec une micro-animation et le numéro exact de la nouvelle version.
+* **Redirection sécurisée :** Un bouton cliquable "Télécharger" utilise le module `shell.openExternal` d'Electron pour ouvrir la page GitHub officielle de la Release directement dans le navigateur par défaut de l'utilisateur.
+* **Mémoire de session :** Le bandeau peut être fermé temporairement d'un clic ; l'application mémorise le choix pour toute la session active afin de ne pas perturber l'utilisateur.
+
 ---
 
 ## 🛠️ Stack Technique

@@ -35,4 +35,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
   getChargeAffaires: () => ipcRenderer.invoke('get-charge-affaires'),
   addChargeAffaire: (data: any) => ipcRenderer.invoke('add-charge-affaire', data),
   deleteChargeAffaire: (id: number) => ipcRenderer.invoke('delete-charge-affaire', id),
+  openExternal: (url: string) => ipcRenderer.invoke('open-external', url),
 });

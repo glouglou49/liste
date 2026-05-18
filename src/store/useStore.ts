@@ -76,6 +76,7 @@ declare global {
       getChargeAffaires: () => Promise<ChargeAffaire[]>;
       addChargeAffaire: (data: { filiale_id: number; name: string }) => Promise<{ success: boolean; id?: number; error?: string }>;
       deleteChargeAffaire: (id: number) => Promise<{ success: boolean; error?: string }>;
+      openExternal: (url: string) => Promise<{ success: boolean; error?: string }>;
     };
   }
 }

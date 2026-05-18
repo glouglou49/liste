@@ -3,6 +3,7 @@ import { useStore } from './store/useStore';
 import { Dashboard } from './components/Dashboard';
 import { ProjectView } from './components/ProjectView';
 import { CatalogAdmin } from './components/CatalogAdmin';
+import { UpdateNotifier } from './components/UpdateNotifier';
 
 export default function App() {
   const { currentProjectId, isLoaded, loadState } = useStore();
@@ -20,6 +21,7 @@ export default function App() {
 
   return (
     <div className="h-screen w-full bg-slate-100 overflow-hidden font-sans flex flex-col">
+      <UpdateNotifier />
       {showAdmin ? (
         <CatalogAdmin onBack={() => setShowAdmin(false)} />
       ) : currentProjectId ? (
