@@ -1,7 +1,11 @@
 {
-  "name": "react-example",
+  "name": "liste-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/glouglou49/liste.git"
+  },
   "main": "dist-electron/main.js",
   "type": "module",
   "scripts": {
@@ -9,6 +13,7 @@
     "start": "vite",
     "build": "vite build",
     "electron:build": "vite build && electron-builder",
+    "electron:release": "vite build && electron-builder --publish always",
     "preview": "vite preview",
     "clean": "rm -rf dist dist-electron",
     "lint": "tsc --noEmit"
@@ -46,6 +51,9 @@
     "directories": {
       "output": "release"
     },
+    "publish": [
+      "github"
+    ],
     "win": {
       "target": [
         "nsis"
