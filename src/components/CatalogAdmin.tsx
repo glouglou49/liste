@@ -176,6 +176,7 @@ export const CatalogAdmin: React.FC<CatalogAdminProps> = ({ onBack }) => {
       const res = await window.electronAPI.importExcelCatalog(importFilePath, mapping);
       if (res.success) {
         setShowImportModal(false);
+        await refreshCatalogs();
         if (activeTab === 'references') fetchReferences();
         else fetchManufacturers();
       } else {
@@ -639,7 +640,7 @@ export const CatalogAdmin: React.FC<CatalogAdminProps> = ({ onBack }) => {
 
       {showImportModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between p-6 border-b border-slate-100 bg-slate-50/50">
               <h2 className="text-xl font-bold text-slate-800 flex items-center">
                 <UploadCloud className="w-5 h-5 mr-2 text-emerald-600" />
@@ -806,7 +807,7 @@ export const CatalogAdmin: React.FC<CatalogAdminProps> = ({ onBack }) => {
       {/* Item Modal (Add/Edit Ref or Manuf) */}
       {showItemModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden flex flex-col">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
             <div className="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
               <h2 className="text-xl font-bold text-slate-800">
                 {itemMode === 'add' ? 'Ajouter' : 'Modifier'} {activeTab === 'references' ? 'une référence' : activeTab === 'manufacturers' ? 'un fabricant' : 'une filiale'}
@@ -819,7 +820,7 @@ export const CatalogAdmin: React.FC<CatalogAdminProps> = ({ onBack }) => {
               </button>
             </div>
             
-            <div className="p-6 space-y-4">
+            <div className="p-6 space-y-4 overflow-y-auto">
               {activeTab === 'references' ? (
                 <>
                   <div>
@@ -913,7 +914,7 @@ export const CatalogAdmin: React.FC<CatalogAdminProps> = ({ onBack }) => {
       {/* Delete Confirmation Modal */}
       {deleteConfirm && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col p-6 text-center">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm max-h-[90vh] overflow-hidden flex flex-col p-6 text-center">
             <h3 className="text-lg font-bold text-slate-800 mb-2">Confirmer la suppression</h3>
             <p className="text-slate-600 mb-6">Êtes-vous sûr de vouloir supprimer {deleteConfirm.type === 'ref' ? `la référence ${deleteConfirm.id}` : deleteConfirm.type === 'manuf' ? `le fabricant ${deleteConfirm.id}` : `cette filiale`} ?</p>
             <div className="flex items-center justify-center gap-3">
@@ -942,7 +943,7 @@ export const CatalogAdmin: React.FC<CatalogAdminProps> = ({ onBack }) => {
       {/* Password Modal */}
       {showPasswordModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
-          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col p-6">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm max-h-[90vh] overflow-hidden flex flex-col p-6">
             <h3 className="text-lg font-bold text-slate-800 mb-2">Authentification requise</h3>
             <p className="text-sm text-slate-600 mb-4">Veuillez entrer le mot de passe administrateur pour modifier le catalogue.</p>
             
@@ -987,7 +988,7 @@ export const CatalogAdmin: React.FC<CatalogAdminProps> = ({ onBack }) => {
       {/* Change Password Modal */}
       {showChangePasswordModal && (
         <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-[70] p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col p-6 animate-in zoom-in-95">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-sm max-h-[90vh] overflow-hidden flex flex-col p-6 animate-in zoom-in-95">
             <h3 className="text-xl font-bold text-slate-800 mb-2 flex items-center gap-2">
               <Key className="w-5 h-5 text-amber-500" />
               Nouveau mot de passe

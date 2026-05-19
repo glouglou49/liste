@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useStore } from '../store/useStore';
-import { ArrowLeft, Upload, Plus, Download, FileText, Search, Trash2, Minus, ChevronLeft, ChevronRight, Menu, Settings, ArrowUpDown, Calendar, ClipboardList } from 'lucide-react';
+import { ArrowLeft, Upload, Plus, Download, FileText, Search, Trash2, Minus, ChevronLeft, ChevronRight, Menu, Settings, ArrowUpDown, Calendar, ClipboardList, Sliders } from 'lucide-react';
 import { ProjectSettingsModal } from './ProjectSettingsModal';
 import { Category, ComponentRef, Project } from '../types';
 import * as XLSX from 'xlsx';
@@ -64,15 +64,23 @@ function EditableQuantity({ value, onSave }: { value: number, onSave: (val: numb
   return (
     <div className="flex items-center justify-center gap-1 h-7">
       <button
-        onClick={(e) => { e.stopPropagation(); setTempValue(''); setMode('edit-add'); }}
-        className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 rounded transition-colors focus:outline-none flex items-center justify-center w-7 h-7"
-        title="Ajouter à la quantité"
+        onClick={(e) => { e.stopPropagation(); onSave(Math.max(0, value - 1)); }}
+        className="text-red-500 hover:text-red-700 hover:bg-red-50 rounded transition-colors focus:outline-none flex items-center justify-center w-8 h-7 text-xs font-bold border border-red-200"
+        title="Soustraire 1"
       >
-        <Plus className="w-5 h-5" />
+        -1
+      </button>
+
+      <button
+        onClick={(e) => { e.stopPropagation(); setTempValue(''); setMode('edit-sub'); }}
+        className="text-red-500 hover:text-red-700 hover:bg-red-100 rounded transition-colors focus:outline-none flex items-center justify-center w-7 h-7"
+        title="Soustraire à la quantité..."
+      >
+        <Minus className="w-5 h-5" />
       </button>
 
       <div
-        className="px-2 bg-blue-100 text-blue-800 rounded-md min-w-[2.5rem] cursor-pointer hover:bg-blue-200 transition-colors font-medium text-sm text-center flex items-center justify-center h-7"
+        className="px-2 bg-blue-100 text-blue-800 rounded-md min-w-[2.5rem] cursor-pointer hover:bg-blue-200 transition-colors font-medium text-sm text-center flex items-center justify-center h-7 font-bold"
         onClick={() => { setTempValue(value); setMode('edit-abs'); }}
         title="Modifier la quantité totale"
       >
@@ -80,18 +88,79 @@ function EditableQuantity({ value, onSave }: { value: number, onSave: (val: numb
       </div>
 
       <button
-        onClick={(e) => { e.stopPropagation(); setTempValue(''); setMode('edit-sub'); }}
-        className="text-red-500 hover:text-red-700 hover:bg-red-100 rounded transition-colors focus:outline-none flex items-center justify-center w-7 h-7"
-        title="Soustraire de la quantité"
+        onClick={(e) => { e.stopPropagation(); setTempValue(''); setMode('edit-add'); }}
+        className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-100 rounded transition-colors focus:outline-none flex items-center justify-center w-7 h-7"
+        title="Ajouter à la quantité..."
       >
-        <Minus className="w-5 h-5" />
+        <Plus className="w-5 h-5" />
+      </button>
+
+      <button
+        onClick={(e) => { e.stopPropagation(); onSave(value + 1); }}
+        className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded transition-colors focus:outline-none flex items-center justify-center w-8 h-7 text-xs font-bold border border-emerald-200"
+        title="Ajouter 1"
+      >
+        +1
       </button>
     </div>
   );
 }
 
+function EditableReference({ value, onSave, suggestedRefs }: { value: string, onSave: (newRef: string) => void, suggestedRefs: ComponentRef[] }) {
+  const [mode, setMode] = useState<'view' | 'edit'>('view');
+  const [tempValue, setTempValue] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (mode === 'edit' && inputRef.current) {
+      inputRef.current.focus();
+      inputRef.current.select();
+    }
+  }, [mode]);
+
+  const handleSave = () => {
+    const newVal = tempValue.trim();
+    setMode('view');
+    if (newVal && newVal !== value) {
+      onSave(newVal);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSave();
+    if (e.key === 'Escape') setMode('view');
+  };
+
+  if (mode === 'edit') {
+    return (
+      <input
+        ref={inputRef}
+        type="text"
+        list="all-refs-list"
+        className="w-full px-2 py-1 border border-blue-500 rounded text-sm outline-none bg-white font-bold"
+        value={tempValue}
+        onChange={e => setTempValue(e.target.value)}
+        onBlur={handleSave}
+        onKeyDown={handleKeyDown}
+      />
+    );
+  }
+
+  return (
+    <div
+      onClick={() => { setTempValue(value); setMode('edit'); }}
+      className="cursor-pointer hover:bg-slate-200 hover:text-blue-700 px-2 py-1 rounded transition-colors font-bold text-slate-900 truncate max-w-[200px]"
+      title="Cliquez pour modifier la référence"
+    >
+      {value}
+    </div>
+  );
+}
+
+type ColumnId = 'ref' | 'designation' | 'quantity' | 'status' | 'manufacturer' | 'fabCode' | 'listsInfo';
+
 export function ProjectView() {
-  const { currentProjectId, currentProject, closeProject, bomLines, manufacturers, addOrUpdateBOMLine, removeBOMLine, updateBOMLineQte, importBOMData, sublists, addSublist, removeSublist, currentProjectPath } = useStore();
+  const { currentProjectId, currentProject, closeProject, bomLines, manufacturers, addOrUpdateBOMLine, removeBOMLine, updateBOMLineQte, updateBOMLineRef, importBOMData, sublists, addSublist, removeSublist, currentProjectPath } = useStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [activeView, setActiveView] = useState('Globale');
@@ -102,8 +171,79 @@ export function ProjectView() {
     }
     return lists;
   }, [sublists, currentProjectId]);
+  const isListeAchatActive = useMemo(() => {
+    const currentSublist = projectSublists.find(s => s.id === activeView);
+    return activeView === 'ListeAchat' || (currentSublist && currentSublist.name.toLowerCase().trim() === 'liste achat');
+  }, [projectSublists, activeView]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'ref_fab' | 'date' | 'status'>('ref_fab');
+
+  const [columns, setColumns] = useState<Record<ColumnId, { visible: boolean; width: number }>>(() => {
+    const saved = localStorage.getItem('project_view_columns_v1');
+    if (saved) {
+      try {
+        return JSON.parse(saved);
+      } catch (e) {}
+    }
+    return {
+      ref: { visible: true, width: 200 },
+      designation: { visible: true, width: 350 },
+      quantity: { visible: true, width: 140 },
+      status: { visible: true, width: 150 },
+      manufacturer: { visible: true, width: 180 },
+      fabCode: { visible: true, width: 150 },
+      listsInfo: { visible: true, width: 150 },
+    };
+  });
+
+  useEffect(() => {
+    localStorage.setItem('project_view_columns_v1', JSON.stringify(columns));
+  }, [columns]);
+
+  const [showColDropdown, setShowColDropdown] = useState(false);
+  const colDropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (colDropdownRef.current && !colDropdownRef.current.contains(event.target as Node)) {
+        setShowColDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const resizingColumnRef = useRef<{ id: ColumnId; startX: number; startWidth: number } | null>(null);
+
+  const handleMouseDown = (e: React.MouseEvent, id: ColumnId) => {
+    e.preventDefault();
+    resizingColumnRef.current = {
+      id,
+      startX: e.clientX,
+      startWidth: columns[id].width,
+    };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!resizingColumnRef.current) return;
+    const { id, startX, startWidth } = resizingColumnRef.current;
+    const diff = e.clientX - startX;
+    const newWidth = Math.max(50, startWidth + diff);
+    setColumns(prev => ({
+      ...prev,
+      [id]: { ...prev[id], width: newWidth }
+    }));
+  };
+
+  const handleMouseUp = () => {
+    resizingColumnRef.current = null;
+    document.removeEventListener('mousemove', handleMouseMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
 
   useEffect(() => {
     if (activeView !== 'EtatPrepa' && sortBy === 'status') {
@@ -160,10 +300,12 @@ export function ProjectView() {
   const viewLines = useMemo(() => {
     let filtered = bomLines.filter(l => l.projectId === currentProjectId);
 
-    if (activeView === 'EtatPrepa') {
+    if (activeView === 'Globale') {
+      filtered = filtered.filter(l => l.sublistId !== 'Chiffrage');
+    } else if (activeView === 'EtatPrepa') {
       const approSublists = projectSublists.filter(s => s.type === 'appro_anticipe').map(s => s.id);
-      filtered = filtered.filter(l => approSublists.includes(l.sublistId));
-    } else if (activeView !== 'Globale') {
+      filtered = filtered.filter(l => approSublists.includes(l.sublistId) && l.sublistId !== 'Chiffrage');
+    } else {
       filtered = filtered.filter(l => l.sublistId === activeView);
     }
 
@@ -207,9 +349,12 @@ export function ProjectView() {
         }
       }
       finalFiltered = Array.from(mergedMap.values());
+      if (activeView === 'EtatPrepa') {
+        finalFiltered = finalFiltered.filter(l => l.quantity > 0);
+      }
     } else {
       finalFiltered = filtered.map(line => {
-        const slName = projectSublists.find(s => s.id === line.sublistId)?.name || 'Inconnu';
+        const slName = line.sublistId === 'Chiffrage' ? 'Chiffrage' : (projectSublists.find(s => s.id === line.sublistId)?.name || 'Inconnu');
         return { ...line, listsInfo: [slName] };
       });
     }
@@ -335,6 +480,28 @@ export function ProjectView() {
     setPendingImports([]);
   };
 
+  const handleImportFromChiffrage = async () => {
+    if (!currentProjectId || !activeView) return;
+
+    const chiffrageLines = bomLines.filter(
+      (l) => l.projectId === currentProjectId && l.sublistId === 'Chiffrage'
+    );
+    if (chiffrageLines.length === 0) {
+      alert("Aucune référence trouvée dans la liste Chiffrage.");
+      return;
+    }
+
+    const mappedData = chiffrageLines.map((line) => ({
+      'Référence': line.ref,
+      'Quantité': 0,
+      '_sublistId': activeView,
+      'Catégorie': line.category,
+      'Localisation': line.location || ''
+    }));
+
+    await importBOMData(currentProjectId, mappedData);
+  };
+
   const handleRefBlur = async () => {
     if (!newRef) return;
     let finalRef = newRef.trim();
@@ -353,7 +520,7 @@ export function ProjectView() {
 
   const handleManualAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!currentProjectId || !newRef || activeView === 'Globale' || activeView === 'EtatPrepa') return;
+    if (!currentProjectId || !newRef || activeView === 'Globale' || activeView === 'EtatPrepa' || activeView === 'Chiffrage') return;
 
     let finalRef = newRef.trim();
 
@@ -497,6 +664,15 @@ export function ProjectView() {
                 </div>
               </div>
 
+              <div className="mt-4 border-t border-slate-100 pt-3">
+                <button
+                  onClick={() => setActiveView('Chiffrage')}
+                  className={`w-full text-left px-2 py-2 rounded-md text-sm font-medium transition-colors ${activeView === 'Chiffrage' ? 'bg-blue-50 text-blue-700 font-semibold' : 'text-slate-700 hover:bg-slate-100'}`}
+                >
+                  Chiffrage
+                </button>
+              </div>
+
             </div>
           </div>
 
@@ -508,14 +684,90 @@ export function ProjectView() {
 
         {/* Header */}
 
+        {/* Project Info Banner */}
+        <div className="bg-slate-50 border-b border-slate-200 px-6 py-2.5 flex flex-wrap items-center gap-x-6 gap-y-2 text-xs shrink-0 shadow-sm">
+          <div className="flex items-center gap-2">
+            <span className="text-slate-400 font-semibold uppercase tracking-wider">Affaire :</span>
+            <span className="font-bold text-slate-800 text-sm">{project.id} {project.nomAffaire ? `- ${project.nomAffaire}` : ''}</span>
+          </div>
+
+          <div className="h-4 w-px bg-slate-200 self-center hidden sm:block"></div>
+
+          {project.client && (
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400 font-semibold uppercase tracking-wider">Client :</span>
+              <span className="font-bold text-slate-800">{project.client}</span>
+            </div>
+          )}
+
+          {project.nomTableau && (
+            <>
+              <div className="h-4 w-px bg-slate-200 self-center hidden sm:block"></div>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-semibold uppercase tracking-wider">Tableau :</span>
+                <span className="font-bold text-slate-800">{project.nomTableau}</span>
+              </div>
+            </>
+          )}
+
+          {project.filialeOrigine && (
+            <>
+              <div className="h-4 w-px bg-slate-200 self-center hidden sm:block"></div>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-semibold uppercase tracking-wider">Filiale :</span>
+                <span className="font-bold text-slate-800">{project.filialeOrigine}</span>
+              </div>
+            </>
+          )}
+
+          {project.chargeAffaire && (
+            <>
+              <div className="h-4 w-px bg-slate-200 self-center hidden sm:block"></div>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-semibold uppercase tracking-wider">Chargé d'Affaire :</span>
+                <span className="font-bold text-slate-800">{project.chargeAffaire}</span>
+              </div>
+            </>
+          )}
+
+          {project.techName && (
+            <>
+              <div className="h-4 w-px bg-slate-200 self-center hidden sm:block"></div>
+              <div className="flex items-center gap-2">
+                <span className="text-slate-400 font-semibold uppercase tracking-wider">Tech BE :</span>
+                <span className="font-bold text-slate-800">{project.techName}</span>
+              </div>
+            </>
+          )}
+
+          {(project.isSousTraitance || project.isUF) && (
+            <>
+              <div className="h-4 w-px bg-slate-200 self-center hidden sm:block"></div>
+              <div className="flex items-center gap-2 flex-wrap">
+                {project.isSousTraitance && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-200" title={project.filialeExecutant ? `Exécutant: ${project.filialeExecutant} (${project.affaireExecutant || '-'} / ${project.ligneExecutant || '-'})` : 'Sous-traitance'}>
+                    Sous-traitance {project.filialeExecutant ? `(${project.filialeExecutant})` : ''}
+                  </span>
+                )}
+                {project.isUF && (
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-50 text-purple-700 border border-purple-200" title={project.affaireUF ? `UF Affaire: ${project.affaireUF} (${project.ligneUF || '-'})` : 'UF'}>
+                    UF {project.affaireUF ? `(${project.affaireUF})` : ''}
+                  </span>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Header */}
         <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center justify-between shrink-0">
           <h1 className="text-xl font-bold text-slate-800">
-            {activeView === 'Globale' ? 'Liste globale' : activeView === 'EtatPrepa' ? 'État préparatoire' : projectSublists.find(s => s.id === activeView)?.name || 'Vue'}
+            {activeView === 'Globale' ? 'Liste globale' : activeView === 'EtatPrepa' ? 'État préparatoire' : activeView === 'Chiffrage' ? 'Chiffrage' : projectSublists.find(s => s.id === activeView)?.name || 'Vue'}
           </h1>
           <div className="flex items-center gap-3">
             <button
               onClick={() => {
-                const subName = activeView === 'Globale' ? 'Liste globale' : activeView === 'EtatPrepa' ? 'État préparatoire' : projectSublists.find(s => s.id === activeView)?.name || 'Vue';
+                const subName = activeView === 'Globale' ? 'Liste globale' : activeView === 'EtatPrepa' ? 'État préparatoire' : activeView === 'Chiffrage' ? 'Chiffrage' : projectSublists.find(s => s.id === activeView)?.name || 'Vue';
                 ExportService.exportToPDF(project, viewLines, subName, currentProjectPath);
               }}
               className="px-4 py-2 bg-red-50 text-red-700 border border-red-200 rounded-md text-sm font-medium hover:bg-red-100 flex items-center gap-2 transition-colors"
@@ -525,7 +777,7 @@ export function ProjectView() {
             </button>
             <button
               onClick={() => {
-                const subName = activeView === 'Globale' ? 'Liste globale' : activeView === 'EtatPrepa' ? 'État préparatoire' : projectSublists.find(s => s.id === activeView)?.name || 'Vue';
+                const subName = activeView === 'Globale' ? 'Liste globale' : activeView === 'EtatPrepa' ? 'État préparatoire' : activeView === 'Chiffrage' ? 'Chiffrage' : projectSublists.find(s => s.id === activeView)?.name || 'Vue';
                 ExportService.exportToExcel(project, viewLines, subName, currentProjectPath);
               }}
               className="px-4 py-2 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-md text-sm font-medium hover:bg-emerald-100 flex items-center gap-2 transition-colors"
@@ -596,30 +848,193 @@ export function ProjectView() {
                   onChange={e => setSearchTerm(e.target.value)}
                 />
               </div>
+
+              {/* Colonnes dropdown */}
+              <div className="relative" ref={colDropdownRef}>
+                <button
+                  onClick={() => setShowColDropdown(!showColDropdown)}
+                  className="px-3 py-2 border border-slate-300 rounded-md text-sm font-medium hover:bg-slate-50 flex items-center gap-2 transition-colors bg-white text-slate-700 shadow-sm"
+                  title="Afficher/Masquer les colonnes"
+                >
+                  <Sliders className="w-4 h-4 text-slate-500" />
+                  Colonnes
+                </button>
+
+                {showColDropdown && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-xl z-30 p-4 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Colonnes affichées</h4>
+                    <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+                      <label className="flex items-center gap-2.5 text-sm text-slate-700 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={columns.ref.visible}
+                          onChange={(e) => setColumns(prev => ({ ...prev, ref: { ...prev.ref, visible: e.target.checked } }))}
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="font-medium">Référence</span>
+                      </label>
+                      <label className="flex items-center gap-2.5 text-sm text-slate-700 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={columns.designation.visible}
+                          onChange={(e) => setColumns(prev => ({ ...prev, designation: { ...prev.designation, visible: e.target.checked } }))}
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="font-medium">Désignation</span>
+                      </label>
+                      <label className="flex items-center gap-2.5 text-sm text-slate-700 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={columns.quantity.visible}
+                          onChange={(e) => setColumns(prev => ({ ...prev, quantity: { ...prev.quantity, visible: e.target.checked } }))}
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="font-medium">Quantité</span>
+                      </label>
+                      {activeView === 'EtatPrepa' && (
+                        <label className="flex items-center gap-2.5 text-sm text-slate-700 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={columns.status.visible}
+                            onChange={(e) => setColumns(prev => ({ ...prev, status: { ...prev.status, visible: e.target.checked } }))}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="font-medium">Statut</span>
+                        </label>
+                      )}
+                      <label className="flex items-center gap-2.5 text-sm text-slate-700 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={columns.manufacturer.visible}
+                          onChange={(e) => setColumns(prev => ({ ...prev, manufacturer: { ...prev.manufacturer, visible: e.target.checked } }))}
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="font-medium">Fabricant</span>
+                      </label>
+                      <label className="flex items-center gap-2.5 text-sm text-slate-700 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer transition-colors">
+                        <input
+                          type="checkbox"
+                          checked={columns.fabCode.visible}
+                          onChange={(e) => setColumns(prev => ({ ...prev, fabCode: { ...prev.fabCode, visible: e.target.checked } }))}
+                          className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                        />
+                        <span className="font-medium">Code Fabricant</span>
+                      </label>
+                      {(activeView === 'Globale' || activeView === 'EtatPrepa') && (
+                        <label className="flex items-center gap-2.5 text-sm text-slate-700 hover:bg-slate-50 p-1.5 rounded-lg cursor-pointer transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={columns.listsInfo.visible}
+                            onChange={(e) => setColumns(prev => ({ ...prev, listsInfo: { ...prev.listsInfo, visible: e.target.checked } }))}
+                            className="rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="font-medium">Liste</span>
+                        </label>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
           {/* Data Grid */}
           <div className="flex-1 bg-white border border-slate-200 rounded-lg shadow-sm flex flex-col overflow-hidden">
             <div className="flex-1 overflow-auto">
-              <table className="min-w-full divide-y divide-slate-200 relative">
+              <table 
+                className="min-w-full divide-y divide-slate-200 relative"
+                style={{
+                  tableLayout: 'fixed',
+                  width: Object.entries(columns).reduce((acc, [id, col]) => acc + (col.visible ? col.width : 0), 0) + (activeView !== 'Globale' && activeView !== 'EtatPrepa' ? 64 : 0)
+                }}
+              >
                 <thead className="bg-slate-50 sticky top-0 z-10 shadow-sm">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Référence</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Désignation</th>
-                    <th className="px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-24">Qté</th>
-                    {activeView === 'EtatPrepa' && <th className="px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider w-36">Statut</th>}
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Fabricant</th>
-                    <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider w-24">Code Fab.</th>
-                    {(activeView === 'Globale' || activeView === 'EtatPrepa') && <th className="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Liste</th>}
+                    {columns.ref.visible && (
+                      <th style={{ width: columns.ref.width, minWidth: columns.ref.width, maxWidth: columns.ref.width }} className="relative px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider select-none">
+                        Référence
+                        <div
+                          onMouseDown={(e) => handleMouseDown(e, 'ref')}
+                          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 transition-colors z-20"
+                        />
+                      </th>
+                    )}
+                    {columns.designation.visible && (
+                      <th style={{ width: columns.designation.width, minWidth: columns.designation.width, maxWidth: columns.designation.width }} className="relative px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider select-none">
+                        Désignation
+                        <div
+                          onMouseDown={(e) => handleMouseDown(e, 'designation')}
+                          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 transition-colors z-20"
+                        />
+                      </th>
+                    )}
+                    {columns.quantity.visible && (
+                      <th style={{ width: columns.quantity.width, minWidth: columns.quantity.width, maxWidth: columns.quantity.width }} className="relative px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider select-none">
+                        Qté
+                        <div
+                          onMouseDown={(e) => handleMouseDown(e, 'quantity')}
+                          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 transition-colors z-20"
+                        />
+                      </th>
+                    )}
+                    {activeView === 'EtatPrepa' && columns.status.visible && (
+                      <th style={{ width: columns.status.width, minWidth: columns.status.width, maxWidth: columns.status.width }} className="relative px-6 py-3 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider select-none">
+                        Statut
+                        <div
+                          onMouseDown={(e) => handleMouseDown(e, 'status')}
+                          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 transition-colors z-20"
+                        />
+                      </th>
+                    )}
+                    {columns.manufacturer.visible && (
+                      <th style={{ width: columns.manufacturer.width, minWidth: columns.manufacturer.width, maxWidth: columns.manufacturer.width }} className="relative px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider select-none">
+                        Fabricant
+                        <div
+                          onMouseDown={(e) => handleMouseDown(e, 'manufacturer')}
+                          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 transition-colors z-20"
+                        />
+                      </th>
+                    )}
+                    {columns.fabCode.visible && (
+                      <th style={{ width: columns.fabCode.width, minWidth: columns.fabCode.width, maxWidth: columns.fabCode.width }} className="relative px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider select-none">
+                        Code Fab.
+                        <div
+                          onMouseDown={(e) => handleMouseDown(e, 'fabCode')}
+                          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 transition-colors z-20"
+                        />
+                      </th>
+                    )}
+                    {(activeView === 'Globale' || activeView === 'EtatPrepa') && columns.listsInfo.visible && (
+                      <th style={{ width: columns.listsInfo.width, minWidth: columns.listsInfo.width, maxWidth: columns.listsInfo.width }} className="relative px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider select-none">
+                        Liste
+                        <div
+                          onMouseDown={(e) => handleMouseDown(e, 'listsInfo')}
+                          className="absolute right-0 top-0 bottom-0 w-1.5 cursor-col-resize hover:bg-blue-500/50 active:bg-blue-600 transition-colors z-20"
+                        />
+                      </th>
+                    )}
                     <th className="px-6 py-3 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider w-16"></th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-slate-200">
                   {viewLines.length === 0 ? (
                     <tr>
-                      <td colSpan={activeView === 'Globale' ? 7 : activeView === 'EtatPrepa' ? 8 : 6} className="px-6 py-12 text-center text-slate-500 font-medium">
-                        Aucune ligne pour cette vue. Utilisez l'import ou l'ajout manuel.
+                      <td 
+                        colSpan={
+                          (columns.ref.visible ? 1 : 0) +
+                          (columns.designation.visible ? 1 : 0) +
+                          (columns.quantity.visible ? 1 : 0) +
+                          (activeView === 'EtatPrepa' && columns.status.visible ? 1 : 0) +
+                          (columns.manufacturer.visible ? 1 : 0) +
+                          (columns.fabCode.visible ? 1 : 0) +
+                          ((activeView === 'Globale' || activeView === 'EtatPrepa') && columns.listsInfo.visible ? 1 : 0) +
+                          (activeView !== 'Globale' && activeView !== 'EtatPrepa' ? 1 : 0)
+                        } 
+                        className="px-6 py-12 text-center text-slate-500 font-medium"
+                      >
+                        {activeView === 'Chiffrage'
+                          ? "Aucune ligne pour cette vue. Utilisez l'import Excel."
+                          : "Aucune ligne pour cette vue. Utilisez l'import ou l'ajout manuel."}
                       </td>
                     </tr>
                   ) : viewLines.map((line) => {
@@ -629,20 +1044,38 @@ export function ProjectView() {
                         key={line.id} 
                         className={`hover:bg-slate-100/50 transition-colors group ${isFullyOrdered ? 'bg-slate-100/70 text-slate-900' : ''}`}
                       >
-                        <td className="px-6 py-2.5 whitespace-nowrap text-sm font-bold text-slate-900">{line.ref}</td>
-                        <td className="px-6 py-2.5 text-sm text-slate-600">{line.designation}</td>
-                        <td className={`px-6 py-2.5 whitespace-nowrap text-sm text-center font-medium ${isFullyOrdered ? 'bg-blue-50/10 text-slate-900' : 'bg-blue-50/50 text-slate-900'}`}>
-                          {activeView === 'Globale' || activeView === 'EtatPrepa' ? (
-                            line.quantity
-                          ) : (
-                            <EditableQuantity
-                              value={line.quantity}
-                              onSave={(newQty) => updateBOMLineQte(line.id, newQty)}
-                            />
-                          )}
-                        </td>
-                        {activeView === 'EtatPrepa' && (
-                          <td className={`px-6 py-2.5 whitespace-nowrap text-sm text-center font-bold ${isFullyOrdered ? 'bg-slate-50/10 text-slate-800' : 'bg-slate-50/50 text-slate-800'}`}>
+                        {columns.ref.visible && (
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm font-bold text-slate-900 truncate" style={{ width: columns.ref.width, minWidth: columns.ref.width, maxWidth: columns.ref.width }} title={line.ref}>
+                            {activeView === 'Globale' || activeView === 'EtatPrepa' ? (
+                              line.ref
+                            ) : (
+                              <EditableReference
+                                value={line.ref}
+                                onSave={(newRef) => updateBOMLineRef(line.id, newRef)}
+                                suggestedRefs={suggestedRefs}
+                              />
+                            )}
+                          </td>
+                        )}
+                        {columns.designation.visible && (
+                          <td className="px-6 py-2.5 text-sm text-slate-600 truncate" style={{ width: columns.designation.width, minWidth: columns.designation.width, maxWidth: columns.designation.width }} title={line.designation}>
+                            {line.designation}
+                          </td>
+                        )}
+                        {columns.quantity.visible && (
+                          <td className={`px-6 py-2.5 whitespace-nowrap text-sm text-center font-medium ${isFullyOrdered ? 'bg-blue-50/10 text-slate-900' : 'bg-blue-50/50 text-slate-900'}`} style={{ width: columns.quantity.width, minWidth: columns.quantity.width, maxWidth: columns.quantity.width }}>
+                            {activeView === 'Globale' || activeView === 'EtatPrepa' || activeView === 'Chiffrage' ? (
+                              line.quantity
+                            ) : (
+                              <EditableQuantity
+                                value={line.quantity}
+                                onSave={(newQty) => updateBOMLineQte(line.id, newQty)}
+                              />
+                            )}
+                          </td>
+                        )}
+                        {activeView === 'EtatPrepa' && columns.status.visible && (
+                          <td className={`px-6 py-2.5 whitespace-nowrap text-sm text-center font-bold ${isFullyOrdered ? 'bg-slate-50/10 text-slate-800' : 'bg-slate-50/50 text-slate-800'}`} style={{ width: columns.status.width, minWidth: columns.status.width, maxWidth: columns.status.width }}>
                             {(() => {
                               const total = line.quantity;
                               const ord = line.orderedQty || 0;
@@ -653,10 +1086,18 @@ export function ProjectView() {
                             })()}
                           </td>
                         )}
-                        <td className="px-6 py-2.5 whitespace-nowrap text-sm text-slate-700">{line.manufacturer}</td>
-                        <td className="px-6 py-2.5 whitespace-nowrap text-sm font-mono text-slate-500">{line.fabCode}</td>
-                        {(activeView === 'Globale' || activeView === 'EtatPrepa') && (
-                          <td className="px-6 py-2.5 whitespace-nowrap text-sm">
+                        {columns.manufacturer.visible && (
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm text-slate-700 truncate" style={{ width: columns.manufacturer.width, minWidth: columns.manufacturer.width, maxWidth: columns.manufacturer.width }} title={line.manufacturer}>
+                            {line.manufacturer}
+                          </td>
+                        )}
+                        {columns.fabCode.visible && (
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm font-mono text-slate-500 truncate" style={{ width: columns.fabCode.width, minWidth: columns.fabCode.width, maxWidth: columns.fabCode.width }} title={line.fabCode}>
+                            {line.fabCode}
+                          </td>
+                        )}
+                        {(activeView === 'Globale' || activeView === 'EtatPrepa') && columns.listsInfo.visible && (
+                          <td className="px-6 py-2.5 whitespace-nowrap text-sm truncate" style={{ width: columns.listsInfo.width, minWidth: columns.listsInfo.width, maxWidth: columns.listsInfo.width }}>
                             <div className="flex flex-wrap gap-1">
                               {line.listsInfo.map((cat) => (
                                 <span 
@@ -669,68 +1110,78 @@ export function ProjectView() {
                             </div>
                           </td>
                         )}
-                      <td className="px-6 py-2.5 whitespace-nowrap text-right">
                         {activeView !== 'Globale' && activeView !== 'EtatPrepa' && (
-                          <button
-                            onClick={() => removeBOMLine(line.id)}
-                            className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-600 transition-all rounded hover:bg-red-50"
-                            title="Supprimer la ligne"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <td className="px-6 py-2.5 whitespace-nowrap text-right w-16">
+                            <button
+                              onClick={() => removeBOMLine(line.id)}
+                              className="opacity-0 group-hover:opacity-100 p-1 text-slate-400 hover:text-red-600 transition-all rounded hover:bg-red-50"
+                              title="Supprimer la ligne"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </td>
                         )}
-                      </td>
-                    </tr>
-                  );
-                })}
+                      </tr>
+                    );
+                  })}
 
                   {/* Row add form */}
-                  {activeView !== 'Globale' && activeView !== 'EtatPrepa' && (
+                  {activeView !== 'Globale' && activeView !== 'EtatPrepa' && activeView !== 'Chiffrage' && (
                     <tr className="bg-slate-50/80">
-                      <td className="px-6 py-2.5 whitespace-nowrap text-sm">
-                        <input
-                          type="text"
-                          placeholder="Nouvelle réf..."
-                          list="refs"
-                          className="w-full px-2 py-1.5 border border-slate-300 bg-white rounded-md text-sm"
-                          value={newRef}
-                          onChange={e => setNewRef(e.target.value)}
-                          onBlur={handleRefBlur}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter' && newRef) {
-                              e.preventDefault();
-                              handleManualAdd(e);
-                            }
-                          }}
-                        />
-                        <datalist id="refs">
-                          {suggestedRefs.map(r => <option key={r.ref} value={r.ref}>{r.designation}</option>)}
-                        </datalist>
-                      </td>
-                      <td className="px-6 py-2.5 text-sm text-slate-500">
-                        {newRef ? (refDetails[newRef]?.designation || (suggestedRefs.find(r => r.ref === newRef)?.designation) || 'Saisir une référence...') : 'Saisir une référence'}
-                      </td>
-                      <td className="px-6 py-2.5 whitespace-nowrap text-center">
-                        <input
-                          type="number" min="1" step="0.1" required
-                          className="w-16 px-1 py-1.5 border border-slate-300 bg-white rounded-md text-sm text-center"
-                          value={newQty}
-                          onChange={e => setNewQty(e.target.value === '' ? '' : parseFloat(e.target.value))}
-                          onKeyDown={e => {
-                            if (e.key === 'Enter' && newRef) {
-                              e.preventDefault();
-                              handleManualAdd(e);
-                            }
-                          }}
-                        />
-                      </td>
-                      <td className="px-6 py-2.5 whitespace-nowrap text-sm text-slate-500">
-                        {newRef ? (manufacturers.find(m => m.code === (refDetails[newRef]?.fabCode || suggestedRefs.find(r => r.ref === newRef)?.fabCode))?.name || '-') : '-'}
-                      </td>
-                      <td className="px-6 py-2.5 whitespace-nowrap text-sm text-slate-400 font-mono">
-                        {newRef ? (refDetails[newRef]?.fabCode || suggestedRefs.find(r => r.ref === newRef)?.fabCode || '-') : '-'}
-                      </td>
-                      <td className="px-6 py-2.5 whitespace-nowrap text-right">
+                      {columns.ref.visible && (
+                        <td className="px-6 py-2.5 whitespace-nowrap text-sm" style={{ width: columns.ref.width, minWidth: columns.ref.width, maxWidth: columns.ref.width }}>
+                          <input
+                            type="text"
+                            placeholder="Nouvelle réf..."
+                            list="refs"
+                            className="w-full px-2 py-1.5 border border-slate-300 bg-white rounded-md text-sm"
+                            value={newRef}
+                            onChange={e => setNewRef(e.target.value)}
+                            onBlur={handleRefBlur}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' && newRef) {
+                                e.preventDefault();
+                                handleManualAdd(e);
+                              }
+                            }}
+                          />
+                          <datalist id="refs">
+                            {suggestedRefs.map(r => <option key={r.ref} value={r.ref}>{r.designation}</option>)}
+                          </datalist>
+                        </td>
+                      )}
+                      {columns.designation.visible && (
+                        <td className="px-6 py-2.5 text-sm text-slate-500 truncate" style={{ width: columns.designation.width, minWidth: columns.designation.width, maxWidth: columns.designation.width }}>
+                          {newRef ? (refDetails[newRef]?.designation || (suggestedRefs.find(r => r.ref === newRef)?.designation) || 'Saisir une référence...') : 'Saisir une référence'}
+                        </td>
+                      )}
+                      {columns.quantity.visible && (
+                        <td className="px-6 py-2.5 whitespace-nowrap text-center" style={{ width: columns.quantity.width, minWidth: columns.quantity.width, maxWidth: columns.quantity.width }}>
+                          <input
+                            type="number" min="1" step="0.1" required
+                            className="w-16 px-1 py-1.5 border border-slate-300 bg-white rounded-md text-sm text-center"
+                            value={newQty}
+                            onChange={e => setNewQty(e.target.value === '' ? '' : parseFloat(e.target.value))}
+                            onKeyDown={e => {
+                              if (e.key === 'Enter' && newRef) {
+                                e.preventDefault();
+                                handleManualAdd(e);
+                              }
+                            }}
+                          />
+                        </td>
+                      )}
+                      {columns.manufacturer.visible && (
+                        <td className="px-6 py-2.5 whitespace-nowrap text-sm text-slate-500 truncate" style={{ width: columns.manufacturer.width, minWidth: columns.manufacturer.width, maxWidth: columns.manufacturer.width }}>
+                          {newRef ? (manufacturers.find(m => m.code === (refDetails[newRef]?.fabCode || suggestedRefs.find(r => r.ref === newRef)?.fabCode))?.name || '-') : '-'}
+                        </td>
+                      )}
+                      {columns.fabCode.visible && (
+                        <td className="px-6 py-2.5 whitespace-nowrap text-sm text-slate-400 font-mono truncate" style={{ width: columns.fabCode.width, minWidth: columns.fabCode.width, maxWidth: columns.fabCode.width }}>
+                          {newRef ? (refDetails[newRef]?.fabCode || suggestedRefs.find(r => r.ref === newRef)?.fabCode || '-') : '-'}
+                        </td>
+                      )}
+                      <td className="px-6 py-2.5 whitespace-nowrap text-right w-16">
                         <button
                           onClick={handleManualAdd}
                           disabled={!newRef}
@@ -757,6 +1208,16 @@ export function ProjectView() {
                   onChange={handleImport}
                 />
                 <div className="flex items-center gap-3">
+                  {isListeAchatActive && (
+                    <button
+                      onClick={handleImportFromChiffrage}
+                      className="px-4 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-md text-sm font-medium hover:bg-blue-100 flex items-center gap-2 transition-colors shadow-sm mr-2"
+                      title="Importer les références de la liste Chiffrage avec quantité à 0"
+                    >
+                      <Plus className="w-4 h-4 text-blue-600" />
+                      Importer de Chiffrage
+                    </button>
+                  )}
                   <span className="text-sm font-medium text-slate-600">Importer une liste pour la vue <strong>{activeView}</strong> :</span>
                   <button
                     onClick={() => fileInputRef.current?.click()}
@@ -773,7 +1234,7 @@ export function ProjectView() {
 
           {showImportModal && (
             <div className="fixed inset-0 bg-slate-900/50 flex flex-col items-center justify-center z-50 p-4">
-              <div className="bg-white rounded-xl shadow-xl w-full max-w-lg overflow-hidden flex flex-col">
+              <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
                 <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
                   <h3 className="text-lg font-bold text-slate-800">Configuration d'importation</h3>
                   <button onClick={() => setShowImportModal(false)} className="text-slate-400 hover:text-slate-600">
@@ -906,18 +1367,28 @@ export function ProjectView() {
           )}
           {addListModal.show && (
             <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-xl shadow-xl max-w-sm w-full p-6">
-                <h3 className="text-lg font-bold text-slate-800 mb-4">
-                  {addListModal.type === 'fiche_achat' ? "Nouvelle Fiche achat/reprise" : "Nouvel Appro anticipé"}
-                </h3>
-                <div className="space-y-4">
+              <div className="bg-white rounded-xl shadow-xl w-full max-w-md max-h-[90vh] overflow-hidden flex flex-col">
+                <div className="p-6 border-b border-slate-200 flex items-center justify-between">
+                  <h3 className="text-lg font-bold text-slate-800">
+                    {addListModal.type === 'fiche_achat' ? "Nouvelle Fiche achat/reprise" : "Nouvel Appro anticipé"}
+                  </h3>
+                  <button 
+                    onClick={() => setAddListModal({ show: false, type: 'fiche_achat', name: '' })}
+                    className="text-slate-400 hover:text-slate-600 transition-colors"
+                  >
+                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                <div className="p-6 overflow-y-auto space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Nom</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Nom *</label>
                     <input
                       type="text"
                       value={addListModal.name}
                       onChange={e => setAddListModal({ ...addListModal, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-300 rounded-md text-sm"
+                      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-400 transition-shadow bg-white text-sm"
                       autoFocus
                       onKeyDown={e => {
                         if (e.key === 'Enter' && addListModal.name.trim()) {
@@ -934,10 +1405,10 @@ export function ProjectView() {
                     />
                   </div>
                 </div>
-                <div className="mt-6 flex justify-end gap-3">
+                <div className="p-6 border-t border-slate-200 bg-slate-50 flex items-center justify-end gap-3">
                   <button
                     onClick={() => setAddListModal({ show: false, type: 'fiche_achat', name: '' })}
-                    className="px-4 py-2 text-slate-600 hover:text-slate-800 text-sm font-medium"
+                    className="px-4 py-2 border border-slate-300 rounded-lg font-medium text-slate-700 hover:bg-white transition-colors"
                   >
                     Annuler
                   </button>
@@ -954,7 +1425,7 @@ export function ProjectView() {
                       }
                     }}
                     disabled={!addListModal.name.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md text-sm font-medium hover:bg-blue-700 disabled:opacity-50"
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-medium shadow-sm transition-colors disabled:opacity-50"
                   >
                     Créer
                   </button>
@@ -965,7 +1436,7 @@ export function ProjectView() {
 
           {listToDelete && (
             <div className="fixed inset-0 bg-slate-900/50 flex items-center justify-center p-4 z-50">
-              <div className="bg-white rounded-xl shadow-xl w-full max-w-sm overflow-hidden flex flex-col">
+              <div className="bg-white rounded-xl shadow-xl w-full max-w-sm max-h-[90vh] overflow-hidden flex flex-col">
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2">
                     <Trash2 className="w-5 h-5 text-red-500" />
@@ -1007,6 +1478,9 @@ export function ProjectView() {
           onSave={handleUpdateSettings}
         />
       )}
+      <datalist id="all-refs-list">
+        {suggestedRefs.map(r => <option key={r.ref} value={r.ref}>{r.designation}</option>)}
+      </datalist>
     </div>
   );
 }

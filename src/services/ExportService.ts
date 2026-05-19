@@ -170,9 +170,7 @@ export const ExportService = {
       const dataUri = doc.output('datauristring');
       const base64Data = dataUri.split(',')[1];
       const res = await window.electronAPI.exportPdfAuto(projectPath, cleanFileName, base64Data);
-      if (res.success) {
-        alert(`Fichier PDF exporté avec succès dans le dossier de l'affaire :\n${res.filePath}`);
-      } else {
+      if (!res.success && !res.cancelled) {
         alert(`Erreur lors de l'export PDF automatique :\n${res.error}`);
       }
     } else {
@@ -220,9 +218,7 @@ export const ExportService = {
     if (window.electronAPI && projectPath) {
       const wbout = XLSX.write(workbook, { bookType: 'biff8', type: 'base64' });
       const res = await window.electronAPI.exportExcelAuto(projectPath, cleanFileName, wbout);
-      if (res.success) {
-        alert(`Fichier exporté avec succès dans le dossier de l'affaire :\n${res.filePath}`);
-      } else {
+      if (!res.success && !res.cancelled) {
         alert(`Erreur lors de l'export automatique :\n${res.error}`);
       }
     } else {

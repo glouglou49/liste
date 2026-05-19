@@ -1,7 +1,7 @@
 {
   "name": "liste-app",
   "private": true,
-  "version": "1.0.4",
+  "version": "1.0.5",
   "repository": {
     "type": "git",
     "url": "https://github.com/glouglou49/liste.git"
@@ -16,7 +16,7 @@
     "electron:release": "vite build && electron-builder --publish always",
     "preview": "vite preview",
     "clean": "rm -rf dist dist-electron",
-    "lint": "tsc --noEmit"
+    "lint": "eslint src electron --ext .ts,.tsx && tsc --noEmit"
   },
   "dependencies": {
     "better-sqlite3": "^12.9.0",
@@ -24,15 +24,18 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@google/genai": "^1.29.0",
     "@tailwindcss/vite": "^4.1.14",
     "@types/node": "^22.14.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.4",
+    "@typescript-eslint/parser": "^8.59.4",
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
     "date-fns": "^4.1.0",
     "electron": "^41.5.0",
     "electron-builder": "^26.8.1",
     "electron-rebuild": "^3.2.9",
+    "eslint": "^8.57.1",
+    "eslint-plugin-react-hooks": "^7.1.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.7",
     "lucide-react": "^0.546.0",
@@ -47,8 +50,21 @@
     "zustand": "^5.0.12"
   },
   "build": {
-    "appId": "com.tonentreprise.liste",
-    "productName": "Liste App",
+    "appId": "com.glouglou49.liste-bom",
+    "productName": "Liste BOM",
+    "compression": "maximum",
+    "files": [
+      "dist/**",
+      "dist-electron/**",
+      "!**/*.ts",
+      "!**/*.tsx",
+      "!db/**",
+      "!read_db*",
+      "!get_schema*",
+      "!*.example",
+      "!src/**",
+      "!electron/**/*.ts"
+    ],
     "directories": {
       "output": "release"
     },
@@ -65,7 +81,9 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "createStartMenuShortcut": true
+      "createStartMenuShortcut": true,
+      "installerCompression": "maximum",
+      "differentialPackage": false
     }
   }
 }

@@ -37,7 +37,8 @@ export function Dashboard({ onOpenAdmin }: DashboardProps) {
   };
 
   return (
-    <div className="p-4 sm:p-8 pt-12 sm:pt-20 max-w-4xl mx-auto h-full overflow-auto w-full flex flex-col gap-8">
+    <div className="w-full h-full overflow-auto">
+      <div className="p-4 sm:p-8 pt-12 sm:pt-20 max-w-4xl mx-auto flex flex-col gap-8">
       
       <div className="text-center mb-8 relative">
          <h1 className="text-4xl font-extrabold text-slate-800 tracking-tight">Gestion d'Affaires</h1>
@@ -173,5 +174,6 @@ export function Dashboard({ onOpenAdmin }: DashboardProps) {
         </div>
       )}
     </div>
+  </div>
   );
 }

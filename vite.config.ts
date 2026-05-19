@@ -16,7 +16,9 @@ export default defineConfig(({mode}) => {
           vite: {
             build: {
               rollupOptions: {
-                external: ['better-sqlite3']
+                external: [
+                  'better-sqlite3'
+                ]
               }
             }
           }
@@ -28,9 +30,16 @@ export default defineConfig(({mode}) => {
     ],
     build: {
       minify: true,
-    },
-    define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-pdf':   ['jspdf', 'jspdf-autotable'],
+            'vendor-xlsx':  ['xlsx'],
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-motion': ['motion'],
+          }
+        }
+      }
     },
     resolve: {
       alias: {

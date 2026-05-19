@@ -36,6 +36,7 @@ interface AppState {
   addOrUpdateBOMLine: (line: Omit<BOMLine, 'id'>) => Promise<void>;
   removeBOMLine: (id: string) => Promise<void>;
   updateBOMLineQte: (id: string, quantity: number) => Promise<void>;
+  updateBOMLineRef: (id: string, ref: string) => Promise<void>;
 
   importBOMData: (projectId: string, data: any[]) => Promise<void>;
 }
@@ -51,8 +52,8 @@ declare global {
       openProjectByPath: (filePath: string) => Promise<{ filePath: string, data: any } | { error: string }>;
       saveNewProjectFile: (data: any, defaultFilename?: string) => Promise<string | { error: string } | null>;
       saveProjectByPath: (filePath: string, data: any) => Promise<{ success: boolean; error?: string }>;
-      exportExcelAuto: (listFilePath: string, filename: string, base64Data: string) => Promise<{ success: boolean; filePath?: string; error?: string }>;
-      exportPdfAuto: (listFilePath: string, filename: string, base64Data: string) => Promise<{ success: boolean; filePath?: string; error?: string }>;
+      exportExcelAuto: (listFilePath: string, filename: string, base64Data: string) => Promise<{ success: boolean; filePath?: string; error?: string; cancelled?: boolean }>;
+      exportPdfAuto: (listFilePath: string, filename: string, base64Data: string) => Promise<{ success: boolean; filePath?: string; error?: string; cancelled?: boolean }>;
       saveConfig: (config: any) => Promise<any>;
       loadConfig: () => Promise<any>;
       verifyAdminPassword: (password: string) => Promise<boolean>;
@@ -110,6 +111,7 @@ export const useStore = create<AppState>((set, get) => ({
     set({ dbFilePath: path });
     if (window.electronAPI) {
       await window.electronAPI.saveConfig({ dbFilePath: path });
+      await get().refreshCatalogs();
     }
   },
 
@@ -409,6 +411,35 @@ export const useStore = create<AppState>((set, get) => ({
     await get().saveState();
   },
 
+  updateBOMLineRef: async (id, ref) => {
+    const trimmedRef = ref.trim();
+    if (!trimmedRef) return;
+    
+    set((state) => {
+      const lineToEdit = state.bomLines.find(l => l.id === id);
+      if (!lineToEdit) return {};
+
+      const existingLineIndex = state.bomLines.findIndex(
+        (l) => l.id !== id &&
+               l.projectId === lineToEdit.projectId &&
+               l.sublistId === lineToEdit.sublistId &&
+               l.ref === trimmedRef
+      );
+
+      let updatedLines;
+      if (existingLineIndex >= 0) {
+        updatedLines = [...state.bomLines];
+        updatedLines[existingLineIndex].quantity += lineToEdit.quantity;
+        updatedLines = updatedLines.filter(l => l.id !== id);
+      } else {
+        updatedLines = state.bomLines.map(l => l.id === id ? { ...l, ref: trimmedRef } : l);
+      }
+
+      return { bomLines: updatedLines };
+    });
+    await get().saveState();
+  },
+
   importBOMData: async (projectId, data) => {
       const state = get();
       let updatedLines = [...state.bomLines];
@@ -417,7 +448,8 @@ export const useStore = create<AppState>((set, get) => ({
           const ref = item['Référence'] || item['Reference'] || item['Ref'];
           if(!ref || ref === '-' || String(ref).trim() === '') return;
           
-          let qty = parseFloat(item['Quantité'] || item['Qte'] || item['Qty'] || 1);
+          const rawQty = item['Quantité'] !== undefined ? item['Quantité'] : (item['Qte'] !== undefined ? item['Qte'] : (item['Qty'] !== undefined ? item['Qty'] : 1));
+          let qty = parseFloat(String(rawQty).replace(',', '.'));
           if (isNaN(qty)) qty = 1;
 
           const category = item['Catégorie'] || item['Phase'] || 'Autre';

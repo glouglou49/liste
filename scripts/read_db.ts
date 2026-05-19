@@ -29,18 +29,17 @@ const references = refData
   }));
 
 const jsonContent = `
-import { Manufacturer, ComponentRef, Project } from './types';
+import { Manufacturer, ComponentRef, Project } from '../src/types';
 
 export const mockManufacturers: Manufacturer[] = ${JSON.stringify(manufacturers, null, 2)};
 
 export const mockReferences: ComponentRef[] = ${JSON.stringify(references, null, 2)};
 
 export const mockProjects: Project[] = [
-  { id: '407722-01', techName: 'Yann Chouteau', createdAt: new Date().toISOString() },
-  { id: '407722-02', techName: 'D.RICOU', createdAt: new Date().toISOString() },
+  { id: 'XXXXX-01', techName: 'Technicien A', createdAt: new Date().toISOString() },
+  { id: 'XXXXX-02', techName: 'Technicien B', createdAt: new Date().toISOString() },
 ];
 `;
 
 fs.writeFileSync('src/mockData.ts', jsonContent);
 console.log('mockData.ts generated with', manufacturers.length, 'manufacturers and', references.length, 'references.');
-

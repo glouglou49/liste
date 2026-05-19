@@ -98,6 +98,7 @@ function createWindow() {
       preload: path.join(_dirname, 'preload.mjs'),
       nodeIntegration: false,
       contextIsolation: true,
+      sandbox: true,
     },
     icon: path.join(_dirname, '../public/vite.svg'), // Temporaire
   });
@@ -321,8 +322,37 @@ ipcMain.handle('export-excel-auto', async (_event, listFilePath: string, filenam
   try {
     const dir = path.dirname(listFilePath);
     const destPath = path.join(dir, filename);
+
+    if (fs.existsSync(destPath)) {
+      const choice = await dialog.showMessageBox(mainWindow!, {
+        type: 'question',
+        buttons: ['Remplacer', 'Annuler'],
+        defaultId: 0,
+        cancelId: 1,
+        title: 'Fichier déjà existant',
+        message: `Le fichier "${filename}" existe déjà dans le dossier de l'affaire. Voulez-vous le remplacer ?`
+      });
+      if (choice.response === 1) {
+        return { success: false, cancelled: true };
+      }
+    }
+
     const buffer = Buffer.from(base64Data, 'base64');
     fs.writeFileSync(destPath, buffer);
+
+    const openChoice = await dialog.showMessageBox(mainWindow!, {
+      type: 'info',
+      buttons: ['Ouvrir le fichier', 'Fermer'],
+      defaultId: 0,
+      cancelId: 1,
+      title: 'Export réussi',
+      message: `Fichier Excel exporté avec succès dans le dossier de l'affaire :\n${destPath}\n\nVoulez-vous ouvrir le fichier ?`
+    });
+
+    if (openChoice.response === 0) {
+      shell.openPath(destPath);
+    }
+
     return { success: true, filePath: destPath };
   } catch (error: any) {
     console.error('Error auto-exporting excel:', error);
@@ -334,8 +364,37 @@ ipcMain.handle('export-pdf-auto', async (_event, listFilePath: string, filename:
   try {
     const dir = path.dirname(listFilePath);
     const destPath = path.join(dir, filename);
+
+    if (fs.existsSync(destPath)) {
+      const choice = await dialog.showMessageBox(mainWindow!, {
+        type: 'question',
+        buttons: ['Remplacer', 'Annuler'],
+        defaultId: 0,
+        cancelId: 1,
+        title: 'Fichier déjà existant',
+        message: `Le fichier "${filename}" existe déjà dans le dossier de l'affaire. Voulez-vous le remplacer ?`
+      });
+      if (choice.response === 1) {
+        return { success: false, cancelled: true };
+      }
+    }
+
     const buffer = Buffer.from(base64Data, 'base64');
     fs.writeFileSync(destPath, buffer);
+
+    const openChoice = await dialog.showMessageBox(mainWindow!, {
+      type: 'info',
+      buttons: ['Ouvrir le fichier', 'Fermer'],
+      defaultId: 0,
+      cancelId: 1,
+      title: 'Export réussi',
+      message: `Fichier PDF exporté avec succès dans le dossier de l'affaire :\n${destPath}\n\nVoulez-vous ouvrir le fichier ?`
+    });
+
+    if (openChoice.response === 0) {
+      shell.openPath(destPath);
+    }
+
     return { success: true, filePath: destPath };
   } catch (error: any) {
     console.error('Error auto-exporting pdf:', error);
@@ -492,8 +551,7 @@ ipcMain.handle('import-excel-catalog', async (_event, filePath: string, mapping:
            }
            
            if (validRows.length > 0) {
-             getDb().prepare('DELETE FROM manufacturers').run();
-             const insertFab = getDb().prepare('INSERT INTO manufacturers (code, name) VALUES (?, ?)');
+             const insertFab = getDb().prepare('INSERT OR REPLACE INTO manufacturers (code, name) VALUES (?, ?)');
              for (const item of validRows) {
                insertFab.run(item.code, item.name);
              }
@@ -533,8 +591,7 @@ ipcMain.handle('import-excel-catalog', async (_event, filePath: string, mapping:
            }
            
            if (validRows.length > 0) {
-             getDb().prepare('DELETE FROM references_data').run();
-             const insertRef = getDb().prepare('INSERT INTO references_data (ref, designation, fabCode, weight) VALUES (?, ?, ?, ?)');
+             const insertRef = getDb().prepare('INSERT OR REPLACE INTO references_data (ref, designation, fabCode, weight) VALUES (?, ?, ?, ?)');
              
              for (const item of validRows) {
                try {
