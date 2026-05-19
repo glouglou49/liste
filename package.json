@@ -82,7 +82,6 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "installerCompression": "maximum",
       "differentialPackage": false
     }
   }
